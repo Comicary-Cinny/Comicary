@@ -24,9 +24,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ============================================
 const dbURI = process.env.DATABASE_URL || 'mongodb+srv://haikuhaiku092205_db_user:XnJRvTNFmtFh8EeE@cluster0.xwfjbys.mongodb.net/comicary?appName=Cluster0';
 
-mongoose.connect(dbURI)
-  .then(() => console.log('Successfully connected to MongoDB Atlas!'))
-  .catch((err) => console.error('MongoDB database connection error:', err));
+async function connectToDatabase() {
+  await mongoose.connect(dbURI, {
+    serverSelectionTimeoutMS: 10000,
+    family: 4
+  });
+  console.log('Successfully connected to MongoDB Atlas!');
+}
 
 // --- Schemas & Models ---
 
@@ -569,7 +573,16 @@ app.get('/api/profile/:userId/picture', async (req, res) => {
 // START SERVER
 // ============================================
 async function startServer() {
-  await ensureAdminExists();
+  try {
+    await connectToDatabase();
+    await ensureAdminExists();
+  } catch (error) {
+    console.error('MongoDB database connection error:', error.message);
+    console.error('Check DATABASE_URL, MongoDB Atlas network access, and database credentials.');
+    process.exitCode = 1;
+    return;
+  }
+
   app.listen(PORT, () => {
     console.log(`🚀 Comicary Mongoose server running on http://localhost:${PORT}`);
     console.log(`🔐 Admin Account: ${ADMIN_USERNAME}`);
