@@ -2189,4 +2189,3 @@ function initializeApp() {
   console.log('🚀 Comicary app initialized');
   console.log('📡 API URL: ' + API_URL);
 }
-
