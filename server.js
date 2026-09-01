@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ============================================
 // DATABASE SETUP (MONGODB ATLAS)
 // ============================================
-const dbURI = process.env.DATABASE_URL || 'mongodb+srv://your-fallback-connection-string';
+const dbURI = process.env.DATABASE_URL || 'mongodb+srv://haikuhaiku092205_db_user:XnJRvTNFmtFh8EeE@cluster0.xwfjbys.mongodb.net/comicary?appName=Cluster0';
 
 mongoose.connect(dbURI)
   .then(() => console.log('Successfully connected to MongoDB Atlas!'))
