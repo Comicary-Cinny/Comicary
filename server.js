@@ -325,6 +325,10 @@ app.post('/api/auth/signin', async (req, res) => {
 // ============================================
 
 // Middleware: Verify JWT token
+function isAdminUser(user) {
+  return Boolean(user && (user.isAdmin === true || user.isAdmin === 1 || user.isAdmin === '1'));
+}
+
 function verifyToken(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
 
@@ -335,6 +339,7 @@ function verifyToken(req, res, next) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
+    req.user.isAdmin = isAdminUser(decoded);
     next();
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });
@@ -427,7 +432,7 @@ app.delete('/api/uploads/:id', verifyToken, (req, res) => {
     }
 
     // Admin can delete any upload
-    const isAdmin = req.user.isAdmin === true;
+    const isAdmin = isAdminUser(req.user);
     // Users can delete their own pending uploads
     const isOwnerOfPending = upload.uploadedBy === req.user.id && upload.status === 'pending';
 
@@ -497,7 +502,7 @@ app.post('/api/uploads/:id/publish', verifyToken, (req, res) => {
   const uploadId = req.params.id;
 
   // Admin check
-  if (!req.user.isAdmin) {
+  if (!isAdminUser(req.user)) {
     return res.status(403).json({ error: 'Only admins can publish uploads' });
   }
 
@@ -535,7 +540,7 @@ app.post('/api/uploads/:id/reject', verifyToken, (req, res) => {
   const uploadId = req.params.id;
 
   // Admin check
-  if (req.user.email !== ADMIN_EMAIL && !req.user.isAdmin) {
+  if (!isAdminUser(req.user)) {
     return res.status(403).json({ error: 'Only admins can reject uploads' });
   }
 
