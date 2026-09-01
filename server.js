@@ -713,8 +713,3 @@ process.on('SIGINT', () => {
   });
 });
 
-PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Server is running publicly on port ${PORT}`);
-});
