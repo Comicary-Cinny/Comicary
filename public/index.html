@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comicary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="#" class="logo-avatar">
+        <img src="logo.png" alt="Comicary Logo" class="nav-logo-img">
+        <span class="logo-text">Comicary</span>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="#" id="navHome" class="active-tab">Home</a></li>
+        <li><a href="#" id="navBrowse">Browse</a></li>
+        <li><a href="#" id="navPending" style="display: none;">Pending</a></li>
+        <li><a href="#" id="navPublish" style="display: none;">Publish</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-right">
+      <div class="search-wrapper">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="navSearchInput" placeholder="Search">
+        </div>
+        <div id="searchSuggestions" class="search-suggestions" aria-live="polite"></div>
+      </div>
+
+      <button class="btn btn-bookmarks" id="navBookmarksBtn">
+        <span>🔖</span> Bookmarks
+      </button>
+
+      <div class="profile-dropdown-wrapper" id="profileDropdownWrapper" style="display: none;">
+        <button class="btn btn-profile-mini" id="navProfileMiniBtn">
+          <img id="navProfileMiniPic" src="" alt="Profile" class="profile-mini-pic" style="display: none;">
+          <span id="navProfileMiniPlaceholder" class="profile-mini-placeholder">👤</span>
+        </button>
+        
+        <div class="profile-dropdown-card" id="profileDropdownCard" style="display: none;">
+          <div class="profile-dropdown-header">
+            <img id="dropdownProfilePic" src="" alt="Profile" class="dropdown-profile-pic" style="display: none;">
+            <div id="dropdownProfileEmpty" class="dropdown-profile-empty">👤</div>
+            <div class="profile-dropdown-info">
+              <p id="dropdownUserName" class="dropdown-user-name">Loading...</p>
+              <p id="dropdownUserEmail" class="dropdown-user-email">Loading...</p>
+            </div>
+          </div>
+          <button id="dropdownEditProfileBtn" class="dropdown-edit-btn">✏️ Edit Profile</button>
+          <button id="dropdownLogoutBtn" class="dropdown-logout-btn">🚪 Logout</button>
+        </div>
+      </div>
+
+      <a href="#" class="btn btn-signup" id="navSignUpBtn" style="display: none;">
+        <span>👤+</span> Sign Up
+      </a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div id="viewHome" class="page-view">
+        <h2 class="section-title">Webtoon Reader Dashboard</h2>
+        <p class="section-desc">Welcome to Comicary! Browse titles, track your bookmarks, and join community reviews.</p>
+        
+        <section class="feed-section">
+            <h3>Recent Published Titles</h3>
+            <div id="homeTitlesContainer" class="titles-grid-list"></div>
+        </section>
+    </div>
+
+    <div id="viewPending" class="page-view" style="display: none;">
+        <h2 class="section-title">My Pending Submissions</h2>
+        <p class="section-desc">Upload new titles and manage your pending submissions here. Admins will review and publish them.</p>
+        
+        <section class="upload-section">
+            <h3>📢 Submit a New Title Listing</h3>
+            <form id="uploadTitleForm" novalidate>
+                <div class="form-group-inline" style="flex-direction: column; align-items: flex-start; max-width: 600px; gap: 14px;">
+                    <input type="text" id="comicTitleInput" name="comicTitle" placeholder="Enter comic book title name..." required style="width: 100%;">
+
+                    <input type="text" id="authorNameInput" name="authorName" placeholder="Author name" style="width: 100%;">
+
+                    <textarea id="synopsisInput" name="synopsis" placeholder="Synopsis" rows="3" style="width: 100%; resize: vertical; border: 1px solid rgba(6, 182, 212, 0.35); border-radius: 10px; background: rgba(15, 23, 42, 0.8); color: #f8fafc; padding: 12px 14px; font-family: inherit;"></textarea>
+
+                    <input type="text" id="genreInput" name="genre" placeholder="Genre" style="width: 100%;">
+                    
+                    <div id="dropzone" class="file-dropzone" style="width: 100%;">
+                        <span class="dropzone-icon">📁</span>
+                        <p class="dropzone-text">Drag & Drop your webtoon cover PNG file here or click to browse</p>
+                        <input type="file" id="comicFileInput" name="comicCover" accept="image/png" required style="display: none;">
+                        <div id="filePreview" class="dropzone-preview" style="display: none;"></div>
+                    </div>
+
+                    <div class="file-upload-options">
+                        <button type="button" id="uploadCoverFileBtn" class="upload-file-btn">📁 Upload File</button>
+                    </div>
+                    
+                    <button type="submit" class="submit-auth-btn" style="margin-top: 4px; width: auto; padding: 12px 24px;">Submit for Review</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="feed-section">
+            <h3>Your Pending Submissions</h3>
+            <div id="pendingTitlesContainer" class="titles-grid-list"></div>
+        </section>
+    </div>
+
+    <div id="viewPublish" class="page-view" style="display: none;">
+        <h2 class="section-title">Publish Submissions Queue</h2>
+        <p class="section-desc">Review and publish pending submissions from all users. Click Publish to instantly publish, or Reject to remove.</p>
+        
+        <section class="feed-section">
+            <h3>All Pending Submissions</h3>
+            <div id="publishQueueContainer" class="titles-grid-list"></div>
+        </section>
+    </div>
+
+    <div id="viewProfile" class="page-view" style="display: none;">
+        <h2 class="section-title">My Profile</h2>
+        <p class="section-desc">Manage your profile picture, name, and about me section.</p>
+        
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-picture-section">
+                    <div class="profile-picture-wrapper">
+                        <img id="profilePictureImg" src="" alt="Profile Picture" class="profile-picture" style="display: none;">
+                        <div id="profilePictureEmpty" class="profile-picture-empty">
+                            <span style="font-size: 48px;">👤</span>
+                            <p>No photo yet</p>
+                        </div>
+                    </div>
+                    <label for="profilePictureInput" class="profile-picture-upload-btn">📷 Change Photo</label>
+                    <div class="profile-picture-upload-options">
+                        <button type="button" id="profileUploadFileBtn" class="profile-upload-file-btn">📁 Upload File</button>
+                    </div>
+                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="profile-info-section">
+                    <div class="profile-field">
+                        <label>Name</label>
+                        <input type="text" id="profileNameInput" placeholder="Your name" maxlength="50">
+                    </div>
+
+                    <div class="profile-field">
+                        <label>Email</label>
+                        <input type="email" id="profileEmailDisplay" readonly placeholder="Your email">
+                    </div>
+
+                    <div class="profile-field">
+                        <label>About Me</label>
+                        <textarea id="profileAboutMeInput" placeholder="Tell us about yourself..." maxlength="300" rows="5"></textarea>
+                        <small id="charCount" style="color: #888; margin-top: 6px;">0/300</small>
+                    </div>
+
+                    <div class="profile-actions">
+                        <button id="profileSaveBtn" class="btn-save">💾 Save Changes</button>
+                        <button id="profileCancelBtn" class="btn-cancel">Cancel</button>
+                    </div>
+
+                    <div id="profileMessage" class="profile-message" style="display: none; margin-top: 16px; padding: 12px; border-radius: 8px; text-align: center;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewBrowse" class="page-view" style="display: none;">
+        <h2 class="section-title">Browse Titles & Catalog</h2>
+        <p class="section-desc">Explore every title hosted across our centralized server framework directory.</p>
+        
+        <div id="browseTitlesContainer" class="titles-media-grid"></div>
+    </div>
+  </main>
+
+  <div class="title-detail-modal-overlay" id="titleDetailModal" aria-hidden="true">
+    <div class="title-detail-modal">
+      <button class="close-detail-modal-btn" id="closeTitleDetailModalBtn" aria-label="Close details">&times;</button>
+      <div class="title-detail-content">
+        <div class="title-detail-image-wrap">
+          <img id="detailTitleImage" src="" alt="Title cover" class="title-detail-image">
+        </div>
+        <div class="title-detail-text">
+          <div class="detail-header-actions">
+            <div id="detailTitleRating" class="detail-rating-badge">⭐0</div>
+            <div class="detail-actions-stack">
+              <button id="detailBookmarkBtn" class="detail-bookmark-btn" type="button" aria-label="Bookmark title">☆</button>
+              <button id="detailDeleteBtn" class="detail-delete-btn" type="button" aria-label="Delete title" style="display:none;">🗑️</button>
+            </div>
+          </div>
+          <h3 id="detailTitleName">Title</h3>
+          <p id="detailTitleAuthor" class="detail-author">by Author</p>
+          <p id="detailTitleGenre" class="detail-genre">Genre: Unknown</p>
+          <p id="detailTitleSynopsis" class="detail-synopsis">Synopsis</p>
+
+          <div id="detailCommentsSection" class="detail-comments-section">
+            <div class="detail-comments-header">
+              <h4>Comments</h4>
+            </div>
+
+            <form id="commentForm" class="comment-form">
+              <input type="text" id="commentInput" placeholder="Add a comment..." maxlength="220" required>
+              <button type="submit">Post</button>
+            </form>
+
+            <div id="detailCommentsList" class="detail-comments-list"></div>
+          </div>
+
+          <div id="detailAdminActions" class="detail-admin-actions" style="display: none; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(6, 182, 212, 0.2);">
+            <button id="detailPublishBtn" class="detail-admin-btn publish-btn" type="button" aria-label="Publish submission">✅ Publish</button>
+            <button id="detailRejectBtn" class="detail-admin-btn reject-btn" type="button" aria-label="Reject submission">❌ Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-modal-overlay" id="authModal">
+    <div class="auth-card">
+      <button class="close-modal-btn" id="closeModalBtn">&times;</button>
+      <h3 id="modalTitle">Sign In to Your Account</h3>
+      
+            <!-- Update your authForm inside index.html to look exactly like this -->
+      <form id="authForm" novalidate>
+        <div class="form-group">
+          <label for="authUsername">Username</label>
+          <input type="text" id="authUsername" name="username" placeholder="Enter your username" autocomplete="username" required>
+          <span class="error-msg" id="usernameError">Username is required.</span>
+        </div>
+        
+        <div class="form-group">
+          <label for="authPassword">Password</label>
+          <input type="password" id="authPassword" name="password" placeholder="••••••••" autocomplete="current-password" required>
+          <span class="error-msg" id="passwordError">Password must be at least 6 characters long.</span>
+        </div>
+
+        <div class="form-group" id="confirmPasswordGroup">
+          <label for="authConfirmPassword">Confirm Password</label>
+          <input type="password" id="authConfirmPassword" name="confirmPassword" placeholder="••••••••" autocomplete="new-password" required>
+          <span class="error-msg" id="confirmPasswordError">Passwords do not match.</span>
+        </div>
+        
+        <button type="submit" class="submit-auth-btn" id="submitAuthBtn">Continue</button>
+      </form>
+
+      
+      <div class="auth-footer">
+        <span id="toggleAuthText">Don't have an account?</span>
+        <button id="toggleAuthModeBtn">Sign Up</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-modal-overlay" id="verifyModal">
+    <div class="auth-card" style="text-align: center; position: relative;">
+      <button class="close-modal-btn" id="closeVerifyModalBtn" style="position: absolute; right: 20px; top: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: inherit;">&times;</button>
+      <h3 style="margin-bottom: 12px;">Verify Your Email</h3>
+      <p style="font-size: 14px; margin-bottom: 20px;">We sent a 6-digit confirmation code to your email address.</p>
+      
+      <form id="verifyForm" novalidate>
+        <div class="form-group" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;">
+          <input type="text" id="digit1" name="codeDigit1" class="verify-digit" maxlength="1" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: 600;">
+          <input type="text" id="digit2" name="codeDigit2" class="verify-digit" maxlength="1" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: 600;">
+          <input type="text" id="digit3" name="codeDigit3" class="verify-digit" maxlength="1" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: 600;">
+          <input type="text" id="digit4" name="codeDigit4" class="verify-digit" maxlength="1" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: 600;">
+          <input type="text" id="digit5" name="codeDigit5" class="verify-digit" maxlength="1" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: 600;">
+          <input type="text" id="digit6" name="codeDigit6" class="verify-digit" maxlength="1" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: 600;">
+        </div>
+        <span class="error-msg" id="verifyError" style="margin-bottom: 15px; text-align: center; display: none;">Invalid code. Please enter 123456 to verify.</span>
+        
+        <button type="submit" class="submit-auth-btn">Verify Account</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="auth-modal-overlay" id="adminSignUpModal">
+    <div class="auth-card">
+      <button class="close-modal-btn" id="closeAdminSignUpModalBtn">&times;</button>
+      <h3 id="adminSignUpTitle">Admin Account Registration</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">Enter admin credentials to create the admin account</p>
+      
+      <form id="adminSignUpForm" novalidate>
+        <div class="form-group">
+          <label for="adminRegUsername">Username</label>
+          <input type="text" id="adminRegUsername" name="username" placeholder="enter username" autocomplete="username" required>
+          <span class="error-msg" id="adminRegUsernameError">Username is required.</span>
+        </div>
+        
+        <div class="form-group">
+          <label for="adminRegPassword">Password</label>
+          <input type="password" id="adminRegPassword" name="password" placeholder="••••••••" autocomplete="new-password" required>
+          <span class="error-msg" id="adminRegPasswordError">Password is required.</span>
+        </div>
+        
+        <button type="submit" class="submit-auth-btn" id="submitAdminSignUpBtn">Create Admin Account</button>
+      </form>
+
+      <div class="auth-footer" style="margin-top: 20px; border-top: 1px solid rgba(148, 163, 184, 0.2); padding-top: 15px;">
+        <span style="font-size: 12px;">Back to</span>
+        <button id="backToLoginBtn" style="background: none; border: none; color: #0db6d4; cursor: pointer; text-decoration: underline; font-size: 12px;">regular login</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="delete-confirm-overlay" id="deleteConfirmModal" aria-hidden="true">
+    <div class="delete-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+      <button class="delete-confirm-close" id="closeDeleteConfirmBtn" aria-label="Close delete confirmation">&times;</button>
+      <div class="delete-confirm-header">
+        <span class="delete-confirm-badge">🗑️</span>
+        <span class="delete-confirm-title-label">Code</span>
+      </div>
+      <p class="delete-confirm-message" id="deleteConfirmMessage">Delete "Title" permanently? This action cannot be undone.</p>
+      <div class="delete-confirm-actions">
+        <button class="delete-confirm-btn delete-confirm-ok" id="confirmDeleteBtn">OK</button>
+        <button class="delete-confirm-btn delete-confirm-cancel" id="cancelDeleteBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="notificationToast" class="notification-toast" style="display: none;">
+    <div class="notification-content">
+      <span id="notificationMessage"></span>
+      <button id="notificationClose" class="notification-close" aria-label="Close notification">&times;</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
