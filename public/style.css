@@ -791,6 +791,11 @@ body {
   .btn span { 
     display: none; 
   }
+  .btn-signup {
+    min-width: 44px;
+    padding: 0 12px;
+    flex-shrink: 0;
+  }
   .search-box { 
     min-width: 120px;
     width: auto;
@@ -1779,12 +1784,19 @@ body {
     width: 100%; 
   }
   .btn { 
-    flex-grow: 1; 
+    min-height: 40px;
     font-size: 13px; 
-    padding: 0 10px; 
+    padding: 0 8px; 
   }
   .btn span { 
     display: none; 
+  }
+  .btn-signup {
+    display: block !important;
+    min-width: 40px;
+    padding: 0 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .section-title { 
     font-size: 17px; 
