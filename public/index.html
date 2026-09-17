@@ -13,16 +13,19 @@
 
   <nav class="navbar">
     <div class="nav-left">
-      <a href="#" class="logo-avatar">
+      <a href="#" class="logo-avatar" id="mobileMenuToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navMenu">
         <img src="logo.png" alt="Comicary Logo" class="nav-logo-img">
         <span class="logo-text">Comicary</span>
+        <span class="logo-menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
       </a>
+      <button class="mobile-bookmarks-btn" id="navMobileBookmarksBtn" type="button" aria-label="Open bookmarks" aria-pressed="false">🔖</button>
 
-      <ul class="nav-menu">
+      <ul class="nav-menu" id="navMenu">
         <li><a href="#" id="navHome" class="active-tab">Home</a></li>
         <li><a href="#" id="navBrowse">Browse</a></li>
-        <li><a href="#" id="navPending" style="display: none;">Pending</a></li>
+        <li><a href="#" id="navPending" style="display: none;">Submit</a></li>
         <li><a href="#" id="navPublish" style="display: none;">Publish</a></li>
+        <li class="mobile-signout-item" id="mobileSignOutItem" style="display: none;"><a href="#" id="navMobileSignOut">Sign Out</a></li>
       </ul>
     </div>
 
@@ -174,11 +177,32 @@
     </div>
 
     <div id="viewBrowse" class="page-view" style="display: none;">
-        <h2 class="section-title">Browse Titles & Catalog</h2>
-        <p class="section-desc">Explore every title hosted across our centralized server framework directory.</p>
+        <h2 class="section-title" id="browsePageTitle">Browse</h2>
         
-        <div id="browseTitlesContainer" class="titles-media-grid"></div>
+        <div id="browseTitlesContainer" class="titles-media-grid browse-popular-grid"></div>
+        <div class="browse-sort-controls">
+          <label for="browseSortSelect">Sort by</label>
+          <select id="browseSortSelect" aria-label="Sort browse titles">
+            <option value="popular">Most Popular</option>
+            <option value="newest">Newest</option>
+            <option value="alphabetical">A-Z</option>
+          </select>
+          <div class="custom-sort-dropdown" id="customSortDropdown">
+            <button class="custom-sort-trigger" id="customSortTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span id="customSortValue">Most Popular</span><span class="custom-sort-arrow" aria-hidden="true">⌄</span>
+            </button>
+            <div class="custom-sort-options" id="customSortOptions" role="listbox" tabindex="-1"></div>
+          </div>
+        </div>
+        <button class="browse-all-link" id="browseAllLink" type="button">All <span aria-hidden="true">›</span></button>
+        <div id="browseGenreSections" class="browse-genre-sections"></div>
     </div>
+
+      <div id="viewGenre" class="page-view" style="display: none;">
+        <button class="browse-back-link" id="browseBackLink" type="button"><span aria-hidden="true">&lt;</span> Back to Browse</button>
+        <h2 class="section-title" id="genrePageTitle">Genre</h2>
+        <div id="genrePageContainer" class="titles-media-grid genre-page-grid"></div>
+      </div>
   </main>
 
   <div class="title-detail-modal-overlay" id="titleDetailModal" aria-hidden="true">

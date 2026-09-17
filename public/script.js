@@ -78,10 +78,12 @@ function updateUIForLoggedInUser(username) {
   const profileDropdownWrapper = document.getElementById('profileDropdownWrapper');
   const navPending = document.getElementById('navPending');
   const navPublish = document.getElementById('navPublish');
+  const mobileSignOutItem = document.getElementById('mobileSignOutItem');
   
   // Hide sign up button, show profile dropdown
   if (navSignUpBtn) navSignUpBtn.style.display = 'none';
   if (profileDropdownWrapper) profileDropdownWrapper.style.display = 'block';
+  if (mobileSignOutItem) mobileSignOutItem.style.display = 'list-item';
   
   // Load profile info in dropdown
   loadProfileDropdown();
@@ -103,6 +105,7 @@ function updateUIForLoggedOutUser() {
   const profileDropdownWrapper = document.getElementById('profileDropdownWrapper');
   const navPending = document.getElementById('navPending');
   const navPublish = document.getElementById('navPublish');
+  const mobileSignOutItem = document.getElementById('mobileSignOutItem');
   
   // Hide profile dropdown, show sign up button
   if (navSignUpBtn) {
@@ -114,6 +117,7 @@ function updateUIForLoggedOutUser() {
     };
   }
   if (profileDropdownWrapper) profileDropdownWrapper.style.display = 'none';
+  if (mobileSignOutItem) mobileSignOutItem.style.display = 'none';
   
   // Hide all user-specific tabs when logged out
   if (navPending) navPending.style.display = 'none';
@@ -129,6 +133,46 @@ function showLogoutMenu() {
 // ============================================
 
 function setupEventListeners() {
+  const navbar = document.querySelector('.navbar');
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const navMenu = document.getElementById('navMenu');
+  const navMobileSignOut = document.getElementById('navMobileSignOut');
+
+  const closeMobileMenu = () => {
+    if (!navbar || !mobileMenuToggle) return;
+    navbar.classList.remove('menu-open');
+    mobileMenuToggle.setAttribute('aria-expanded', 'false');
+    mobileMenuToggle.setAttribute('aria-label', 'Open navigation menu');
+  };
+
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const isOpen = navbar.classList.toggle('menu-open');
+      mobileMenuToggle.setAttribute('aria-expanded', String(isOpen));
+      mobileMenuToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+    });
+  }
+
+  if (navMenu) {
+    navMenu.addEventListener('click', (event) => {
+      if (event.target.closest('a')) closeMobileMenu();
+    });
+  }
+
+  if (navMobileSignOut) {
+    navMobileSignOut.addEventListener('click', (event) => {
+      event.preventDefault();
+      closeMobileMenu();
+      logoutUser();
+    });
+  }
+
+  document.addEventListener('click', (event) => {
+    if (navbar && navbar.classList.contains('menu-open') && !navbar.contains(event.target)) closeMobileMenu();
+  });
+
   const closeTitleDetailModalBtn = document.getElementById('closeTitleDetailModalBtn');
   if (closeTitleDetailModalBtn) {
     closeTitleDetailModalBtn.addEventListener('click', closeTitleDetailModal);
@@ -365,6 +409,11 @@ function setupEventListeners() {
   const navPending = document.getElementById('navPending');
   const navPublish = document.getElementById('navPublish');
   const navBookmarksBtn = document.getElementById('navBookmarksBtn');
+  const navMobileBookmarksBtn = document.getElementById('navMobileBookmarksBtn');
+  const browseSortSelect = document.getElementById('browseSortSelect');
+  const browseGenreSections = document.getElementById('browseGenreSections');
+  const browseAllLink = document.getElementById('browseAllLink');
+  const browseBackLink = document.getElementById('browseBackLink');
   
   if (navHome) navHome.addEventListener('click', (e) => {
     e.preventDefault();
@@ -390,6 +439,19 @@ function setupEventListeners() {
     if (navPending) navPending.classList.remove('active-tab');
     if (navPublish) navPublish.classList.remove('active-tab');
     loadTitles();
+  });
+
+  if (navProfile) navProfile.addEventListener('click', (e) => {
+    e.preventDefault();
+    bookmarkViewActive = false;
+    updateBookmarkButtonState();
+    showPage('viewProfile');
+    navProfile.classList.add('active-tab');
+    navHome?.classList.remove('active-tab');
+    navBrowse?.classList.remove('active-tab');
+    navPending?.classList.remove('active-tab');
+    navPublish?.classList.remove('active-tab');
+    loadUserProfile();
   });
 
   if (navPending) navPending.addEventListener('click', (e) => {
@@ -430,6 +492,89 @@ function setupEventListeners() {
       navPending?.classList.remove('active-tab');
       navPublish?.classList.remove('active-tab');
       loadTitles();
+    });
+  }
+
+  if (navMobileBookmarksBtn && navBookmarksBtn) {
+    navMobileBookmarksBtn.addEventListener('click', () => navBookmarksBtn.click());
+  }
+
+  if (browseSortSelect) {
+    browseSortSelect.addEventListener('change', applyBrowseSort);
+  }
+
+  const customSortDropdown = document.getElementById('customSortDropdown');
+  const customSortTrigger = document.getElementById('customSortTrigger');
+  const customSortOptions = document.getElementById('customSortOptions');
+  const customSortValue = document.getElementById('customSortValue');
+
+  if (customSortDropdown && customSortTrigger && customSortOptions && browseSortSelect) {
+    Array.from(browseSortSelect.options).forEach((option) => {
+      const customOption = document.createElement('button');
+      customOption.type = 'button';
+      customOption.className = 'custom-sort-option';
+      customOption.dataset.value = option.value;
+      customOption.textContent = option.textContent;
+      customOption.setAttribute('role', 'option');
+      customOption.addEventListener('click', () => {
+        browseSortSelect.value = option.value;
+        browseSortSelect.dispatchEvent(new Event('change'));
+        customSortValue.textContent = option.textContent;
+        customSortOptions.querySelectorAll('.custom-sort-option').forEach((item) => {
+          item.classList.toggle('is-selected', item === customOption);
+          item.setAttribute('aria-selected', String(item === customOption));
+        });
+        customSortDropdown.classList.remove('is-open');
+        customSortTrigger.setAttribute('aria-expanded', 'false');
+      });
+      customSortOptions.appendChild(customOption);
+    });
+
+    const toggleCustomSort = () => {
+      const isOpen = customSortDropdown.classList.toggle('is-open');
+      customSortTrigger.setAttribute('aria-expanded', String(isOpen));
+    };
+    customSortTrigger.addEventListener('click', toggleCustomSort);
+    customSortTrigger.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleCustomSort();
+        customSortOptions.querySelector('.custom-sort-option')?.focus();
+      }
+    });
+    customSortOptions.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        customSortDropdown.classList.remove('is-open');
+        customSortTrigger.setAttribute('aria-expanded', 'false');
+        customSortTrigger.focus();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!customSortDropdown.contains(event.target)) {
+        customSortDropdown.classList.remove('is-open');
+        customSortTrigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+    customSortOptions.querySelector('.custom-sort-option')?.classList.add('is-selected');
+  }
+
+  if (browseAllLink) {
+    browseAllLink.addEventListener('click', () => {
+      document.getElementById('browseTitlesContainer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  if (browseBackLink) {
+    browseBackLink.addEventListener('click', () => {
+      showPage('viewBrowse');
+    });
+  }
+
+  if (browseGenreSections) {
+    browseGenreSections.addEventListener('click', (event) => {
+      const genreLink = event.target.closest('.browse-genre-link');
+      if (!genreLink) return;
+      showGenrePage(genreLink.dataset.target, genreLink.dataset.genre);
     });
   }
 }
@@ -669,7 +814,7 @@ async function handleAuthSubmit(e) {
     saveUserSession(data.token, data.user);
     closeAuthModal();
     updateUIForLoggedInUser(data.user.username);
-    alert(`Welcome, ${data.user.username}! You are now logged in.`);
+    showNotification(`Welcome, ${data.user.username}! You are now logged in.`, 'success');
     
     // Show upload section for signed-in users
     const uploadSection = document.querySelector('.upload-section');
@@ -785,7 +930,7 @@ async function handleVerifySubmit(e) {
     saveUserSession(data.token, data.user);
     closeVerifyModal();
     updateUIForLoggedInUser(data.user.email);
-    alert(`Welcome, ${data.user.name}! You are now logged in.`);
+    showNotification(`Welcome, ${data.user.name}! You are now logged in.`, 'success');
     
     // Show upload section
     const uploadSection = document.querySelector('.upload-section');
@@ -882,12 +1027,19 @@ function syncBookmarkButtons() {
 
 function updateBookmarkButtonState() {
   const navBookmarksBtn = document.getElementById('navBookmarksBtn');
+  const navMobileBookmarksBtn = document.getElementById('navMobileBookmarksBtn');
   if (!navBookmarksBtn) return;
 
   navBookmarksBtn.classList.toggle('is-active', bookmarkViewActive);
   navBookmarksBtn.innerHTML = bookmarkViewActive
     ? '<span>📑</span> Bookmarks'
     : '<span>🔖</span> Bookmarks';
+  if (navMobileBookmarksBtn) {
+    navMobileBookmarksBtn.textContent = bookmarkViewActive ? '📑' : '🔖';
+    navMobileBookmarksBtn.classList.toggle('is-active', bookmarkViewActive);
+    navMobileBookmarksBtn.setAttribute('aria-pressed', String(bookmarkViewActive));
+    navMobileBookmarksBtn.setAttribute('aria-label', bookmarkViewActive ? 'Close bookmarks' : 'Open bookmarks');
+  }
 }
 
 function syncDetailBookmarkButton() {
@@ -1118,6 +1270,7 @@ async function loadTitles() {
 
     const homeTitlesContainer = document.getElementById('homeTitlesContainer');
     const browseTitlesContainer = document.getElementById('browseTitlesContainer');
+    const browseGenreSections = document.getElementById('browseGenreSections');
 
     if (currentSearchQuery) {
       renderSearchResults();
@@ -1137,7 +1290,7 @@ async function loadTitles() {
           </button>
         `;
         return `
-          <div class="title-card" data-upload-id="${upload.id}" onclick="openTitleDetailsFromCard(this, event)">
+          <div class="title-card" data-upload-id="${upload.id}" data-rating="${avgRating}" data-date="${upload.createdAt || ''}" onclick="openTitleDetailsFromCard(this, event)">
             <div class="title-card-image-container">
               <img src="${API_URL}/uploads/${upload.id}/image" alt="${upload.title}" class="title-card-image" onerror="this.style.display='none'">
               <button class="title-card-comment-btn" data-upload-id="${upload.id}" onclick="openCommentSection(this, event)" aria-label="Open comments">💬</button>
@@ -1173,9 +1326,16 @@ async function loadTitles() {
     }
 
     if (browseTitlesContainer) {
-      browseTitlesContainer.innerHTML = titleHTML || '<p>No bookmarked titles yet.</p>';
+      browseTitlesContainer.innerHTML = titleHTML || (bookmarkViewActive ? '<p>No bookmarked titles yet.</p>' : '<p>No published titles yet.</p>');
       attachRatingListeners(browseTitlesContainer);
+      renderBrowseGenreSections(browseTitlesContainer, browseGenreSections);
+      applyBrowseSort();
     }
+
+    const browsePageTitle = document.getElementById('browsePageTitle');
+    if (browsePageTitle) browsePageTitle.textContent = bookmarkViewActive ? 'Bookmarked' : 'Browse';
+    if (browseGenreSections) browseGenreSections.style.display = bookmarkViewActive ? 'none' : '';
+    if (browseAllLink) browseAllLink.style.display = bookmarkViewActive ? 'none' : '';
   } catch (error) {
     console.error('Error loading titles:', error);
     const homeTitlesContainer = document.getElementById('homeTitlesContainer');
@@ -1183,6 +1343,83 @@ async function loadTitles() {
       homeTitlesContainer.innerHTML = '<p style="color: red;">⚠️ Cannot connect to server. Is it running on localhost:3000?</p>';
     }
   }
+}
+
+function renderBrowseGenreSections(sourceContainer, sectionsContainer) {
+  if (!sourceContainer || !sectionsContainer) return;
+
+  const genreGroups = new Map();
+  sourceContainer.querySelectorAll('.title-card').forEach((card) => {
+    const genres = card.querySelector('.title-card-genre').textContent
+      .replace('Genre: ', '')
+      .split(',')
+      .map((genre) => genre.trim())
+      .filter(Boolean);
+    (genres.length ? genres : ['Unspecified']).forEach((genre) => {
+      if (!genreGroups.has(genre)) genreGroups.set(genre, []);
+      genreGroups.get(genre).push(card.cloneNode(true));
+    });
+  });
+
+  sectionsContainer.innerHTML = '';
+  let rowIndex = 0;
+  const sortedGenreGroups = Array.from(genreGroups.entries()).sort((firstGroup, secondGroup) => {
+    return secondGroup[1].length - firstGroup[1].length || firstGroup[0].localeCompare(secondGroup[0]);
+  });
+
+  sortedGenreGroups.forEach(([genre, cards]) => {
+    const section = document.createElement('section');
+    section.className = 'browse-genre-row';
+    section.id = `browse-genre-${rowIndex}`;
+    section.innerHTML = `<h3><button class="browse-genre-link" type="button" data-target="${section.id}" data-genre="${genre}">${genre} <span aria-hidden="true">›</span></button></h3><div class="browse-genre-cards"></div>`;
+    const cardsContainer = section.querySelector('.browse-genre-cards');
+    cards.forEach((card) => cardsContainer.appendChild(card));
+    sectionsContainer.appendChild(section);
+    attachRatingListeners(cardsContainer);
+    rowIndex += 1;
+  });
+}
+
+function showGenrePage(sectionId, genre) {
+  const sourceSection = document.getElementById(sectionId);
+  const genrePageContainer = document.getElementById('genrePageContainer');
+  const genrePageTitle = document.getElementById('genrePageTitle');
+  if (!sourceSection || !genrePageContainer) return;
+
+  genrePageContainer.innerHTML = '';
+  sourceSection.querySelectorAll('.title-card').forEach((card) => {
+    genrePageContainer.appendChild(card.cloneNode(true));
+  });
+  if (genrePageTitle) genrePageTitle.textContent = genre || 'Genre';
+  attachRatingListeners(genrePageContainer);
+  showPage('viewGenre');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function applyBrowseSort() {
+  const browseTitlesContainer = document.getElementById('browseTitlesContainer');
+  const browseSortSelect = document.getElementById('browseSortSelect');
+  if (!browseTitlesContainer || !browseSortSelect) return;
+
+  const cards = Array.from(browseTitlesContainer.querySelectorAll('.title-card'));
+  const sortMode = browseSortSelect.value;
+
+  cards.sort((firstCard, secondCard) => {
+    if (sortMode === 'alphabetical') {
+      return firstCard.querySelector('.title-card-title').textContent.localeCompare(
+        secondCard.querySelector('.title-card-title').textContent
+      );
+    }
+    if (sortMode === 'newest') {
+      return new Date(secondCard.dataset.date || 0) - new Date(firstCard.dataset.date || 0);
+    }
+    return Number(secondCard.dataset.rating || 0) - Number(firstCard.dataset.rating || 0);
+  });
+
+  cards.forEach((card, index) => {
+    card.style.display = index < 5 ? '' : 'none';
+    browseTitlesContainer.appendChild(card);
+  });
 }
 
 // ============================================

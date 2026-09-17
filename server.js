@@ -62,6 +62,14 @@ const uploadSchema = new mongoose.Schema({
 });
 const Upload = mongoose.model('Upload', uploadSchema);
 
+function normalizeGenres(value) {
+  return [...new Set(String(value || '')
+    .split(',')
+    .map((genre) => genre.trim())
+    .filter(Boolean))]
+    .join(', ');
+}
+
 // Ratings Schema
 const ratingSchema = new mongoose.Schema({
   _id: { type: String, default: uuidv4 },
@@ -343,7 +351,7 @@ app.post('/api/uploads', verifyToken, async (req, res) => {
       uploadedBy: req.user.id,
       author: author || '',
       synopsis: synopsis || '',
-      genre: genre || '',
+      genre: normalizeGenres(genre),
       status: 'pending'
     });
     res.json({ success: true, id: newUpload._id });
@@ -394,7 +402,7 @@ app.put('/api/uploads/:id', verifyToken, async (req, res) => {
     upload.title = title;
     upload.author = author || '';
     upload.synopsis = synopsis || '';
-    upload.genre = genre || '';
+    upload.genre = normalizeGenres(genre);
     if (image) upload.image = image;
     await upload.save();
     res.json({ success: true, id: uploadId });
