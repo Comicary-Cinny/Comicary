@@ -2282,8 +2282,16 @@ body {
 
   .nav-right .search-wrapper,
   .nav-right .search-box {
-    width: 100%;
     min-width: 0;
+  }
+
+  .nav-right .search-wrapper {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  .nav-right .search-box {
+    width: 100%;
   }
 
   .nav-right {

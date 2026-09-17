@@ -83,7 +83,7 @@ function updateUIForLoggedInUser(username) {
   
   // Hide sign up button, show profile dropdown
   if (navbar) navbar.classList.remove('logged-out');
-  if (navSignUpBtn) navSignUpBtn.style.display = 'none';
+  if (navSignUpBtn) navSignUpBtn.style.setProperty('display', 'none', 'important');
   if (profileDropdownWrapper) profileDropdownWrapper.style.display = 'block';
   if (mobileSignOutItem) mobileSignOutItem.style.display = 'list-item';
   
@@ -113,7 +113,7 @@ function updateUIForLoggedOutUser() {
   // Hide profile dropdown, show sign up button
   if (navbar) navbar.classList.add('logged-out');
   if (navSignUpBtn) {
-    navSignUpBtn.style.display = 'flex';
+    navSignUpBtn.style.setProperty('display', 'flex', 'important');
     navSignUpBtn.innerHTML = '<span>👤+</span> Sign In';
     navSignUpBtn.onclick = (e) => {
       e.preventDefault();
