@@ -92,16 +92,6 @@ const commentSchema = new mongoose.Schema({
 });
 const Comment = mongoose.model('Comment', commentSchema);
 
-const commentSchema = new mongoose.Schema({
-  _id: { type: String, default: uuidv4 },
-  uploadId: { type: String, ref: 'Upload', required: true },
-  user: { type: String, default: 'Guest' },
-  text: { type: String, required: true, maxlength: 220 },
-  profilePicture: { type: String, default: null },
-  createdAt: { type: Date, default: Date.now }
-});
-const Comment = mongoose.model('Comment', commentSchema);
-
 // Auto-create admin account if it doesn't exist
 async function ensureAdminExists() {
   try {
