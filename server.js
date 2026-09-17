@@ -82,6 +82,26 @@ const ratingSchema = new mongoose.Schema({
 ratingSchema.index({ uploadId: 1, userId: 1 }, { unique: true });
 const Rating = mongoose.model('Rating', ratingSchema);
 
+const commentSchema = new mongoose.Schema({
+  _id: { type: String, default: uuidv4 },
+  uploadId: { type: String, ref: 'Upload', required: true },
+  user: { type: String, default: 'Guest' },
+  text: { type: String, required: true, maxlength: 220 },
+  profilePicture: { type: String, default: null },
+  createdAt: { type: Date, default: Date.now }
+});
+const Comment = mongoose.model('Comment', commentSchema);
+
+const commentSchema = new mongoose.Schema({
+  _id: { type: String, default: uuidv4 },
+  uploadId: { type: String, ref: 'Upload', required: true },
+  user: { type: String, default: 'Guest' },
+  text: { type: String, required: true, maxlength: 220 },
+  profilePicture: { type: String, default: null },
+  createdAt: { type: Date, default: Date.now }
+});
+const Comment = mongoose.model('Comment', commentSchema);
+
 // Auto-create admin account if it doesn't exist
 async function ensureAdminExists() {
   try {
@@ -271,6 +291,37 @@ function verifyToken(req, res, next) {
   }
 }
 
+app.get('/api/uploads/:id/comments', async (req, res) => {
+  try {
+    const comments = await Comment.find({ uploadId: req.params.id })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json(comments);
+  } catch (error) {
+    res.status(500).json({ error: 'Error loading comments' });
+  }
+});
+
+app.post('/api/uploads/:id/comments', async (req, res) => {
+  const text = String(req.body.text || '').trim();
+  if (!text) return res.status(400).json({ error: 'Comment text is required' });
+  if (text.length > 220) return res.status(400).json({ error: 'Comment is too long' });
+
+  try {
+    const upload = await Upload.findById(req.params.id).select('_id');
+    if (!upload) return res.status(404).json({ error: 'Title not found' });
+    const comment = await Comment.create({
+      uploadId: req.params.id,
+      user: String(req.body.user || 'Guest').trim() || 'Guest',
+      text,
+      profilePicture: req.body.profilePicture || null
+    });
+    res.status(201).json(comment);
+  } catch (error) {
+    res.status(500).json({ error: 'Error saving comment' });
+  }
+});
+
 // Get all uploads with average ratings
 app.get('/api/uploads', async (req, res) => {
   const status = req.query.status || 'published';
@@ -374,6 +425,7 @@ app.delete('/api/uploads/:id', verifyToken, async (req, res) => {
       return res.status(403).json({ error: 'You can only delete your own pending submissions' });
     }
     await Rating.deleteMany({ uploadId: uploadId });
+    await Comment.deleteMany({ uploadId: uploadId });
     await Upload.findByIdAndDelete(uploadId);
     res.json({ success: true, message: 'Upload deleted' });
   } catch (error) {
@@ -460,6 +512,7 @@ app.post('/api/uploads/:id/reject', verifyToken, async (req, res) => {
       return res.status(400).json({ error: 'Only pending uploads can be rejected' });
     }
     await Rating.deleteMany({ uploadId: uploadId });
+    await Comment.deleteMany({ uploadId: uploadId });
     await Upload.findByIdAndDelete(uploadId);
     res.json({ success: true, message: 'Upload rejected and removed' });
   } catch (error) {

@@ -1945,25 +1945,21 @@ function closeTitleDetailModal() {
   if (detailAdminActions) detailAdminActions.style.display = 'none';
 }
 
-function getCommentsForUpload(uploadId) {
-  const raw = localStorage.getItem(`comments_${uploadId}`);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
-function saveCommentsForUpload(uploadId, comments) {
-  localStorage.setItem(`comments_${uploadId}`, JSON.stringify(comments));
-}
-
-function renderComments(uploadId) {
+async function renderComments(uploadId) {
   const list = document.getElementById('detailCommentsList');
   if (!list) return;
 
-  const comments = getCommentsForUpload(uploadId);
+  let comments;
+  try {
+    const response = await fetch(`${API_URL}/uploads/${uploadId}/comments`);
+    if (!response.ok) throw new Error('Failed to load comments');
+    comments = await response.json();
+  } catch (error) {
+    console.error('Error loading comments:', error);
+    list.innerHTML = '<p class="empty-comments">Comments could not be loaded.</p>';
+    return;
+  }
+
   if (!comments.length) {
     list.innerHTML = '<p class="empty-comments">No comments yet. Be the first to leave one.</p>';
     return;
@@ -1991,7 +1987,6 @@ async function handleCommentSubmit(event) {
   const text = input.value.trim();
   if (!text) return;
 
-  const comments = getCommentsForUpload(activeDetailUploadId);
   const userName = authState.currentUser ? (authState.currentUser.name || authState.currentUser.username) : 'Guest';
   let profilePicture = null;
 
@@ -2010,15 +2005,19 @@ async function handleCommentSubmit(event) {
     }
   }
 
-  comments.unshift({
-    user: userName,
-    text,
-    profilePicture
-  });
-
-  saveCommentsForUpload(activeDetailUploadId, comments);
-  renderComments(activeDetailUploadId);
-  input.value = '';
+  try {
+    const response = await fetch(`${API_URL}/uploads/${activeDetailUploadId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: userName, text, profilePicture })
+    });
+    if (!response.ok) throw new Error('Failed to save comment');
+    await renderComments(activeDetailUploadId);
+    input.value = '';
+  } catch (error) {
+    console.error('Error saving comment:', error);
+    showNotification('Comment could not be saved.', 'error');
+  }
 }
 
 async function expandRating(element, event) {
