@@ -1151,6 +1151,15 @@ body {
     background: var(--accent-cyan);
     transform: translateY(-1px);
   }
+  .mobile-bookmark-icon {
+    display: block;
+    width: 14px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-bottom: 0;
+    color: #e2e8f0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%);
+  }
   .search-box { 
     width: 100%;
     min-width: 0;

@@ -1039,7 +1039,6 @@ function updateBookmarkButtonState() {
     ? '<span>📑</span> Bookmarks'
     : '<span>🔖</span> Bookmarks';
   if (navMobileBookmarksBtn) {
-    navMobileBookmarksBtn.textContent = bookmarkViewActive ? '📑' : '🔖';
     navMobileBookmarksBtn.classList.toggle('is-active', bookmarkViewActive);
     navMobileBookmarksBtn.setAttribute('aria-pressed', String(bookmarkViewActive));
     navMobileBookmarksBtn.setAttribute('aria-label', bookmarkViewActive ? 'Close bookmarks' : 'Open bookmarks');
