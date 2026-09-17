@@ -74,6 +74,7 @@ function logoutUser() {
 // ============================================
 
 function updateUIForLoggedInUser(username) {
+  const navbar = document.querySelector('.navbar');
   const navSignUpBtn = document.getElementById('navSignUpBtn');
   const profileDropdownWrapper = document.getElementById('profileDropdownWrapper');
   const navPending = document.getElementById('navPending');
@@ -81,6 +82,7 @@ function updateUIForLoggedInUser(username) {
   const mobileSignOutItem = document.getElementById('mobileSignOutItem');
   
   // Hide sign up button, show profile dropdown
+  if (navbar) navbar.classList.remove('logged-out');
   if (navSignUpBtn) navSignUpBtn.style.display = 'none';
   if (profileDropdownWrapper) profileDropdownWrapper.style.display = 'block';
   if (mobileSignOutItem) mobileSignOutItem.style.display = 'list-item';
@@ -101,6 +103,7 @@ function updateUIForLoggedInUser(username) {
 }
 
 function updateUIForLoggedOutUser() {
+  const navbar = document.querySelector('.navbar');
   const navSignUpBtn = document.getElementById('navSignUpBtn');
   const profileDropdownWrapper = document.getElementById('profileDropdownWrapper');
   const navPending = document.getElementById('navPending');
@@ -108,9 +111,10 @@ function updateUIForLoggedOutUser() {
   const mobileSignOutItem = document.getElementById('mobileSignOutItem');
   
   // Hide profile dropdown, show sign up button
+  if (navbar) navbar.classList.add('logged-out');
   if (navSignUpBtn) {
-    navSignUpBtn.style.display = 'block';
-    navSignUpBtn.innerHTML = '<span>👤+</span> Sign Up';
+    navSignUpBtn.style.display = 'flex';
+    navSignUpBtn.innerHTML = '<span>👤+</span> Sign In';
     navSignUpBtn.onclick = (e) => {
       e.preventDefault();
       openAuthModal(false);

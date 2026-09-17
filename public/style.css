@@ -2285,6 +2285,43 @@ body {
     width: 100%;
     min-width: 0;
   }
+
+  .nav-right {
+    gap: 4px;
+  }
+
+  .nav-right .search-box {
+    height: 40px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .nav-right .search-box input {
+    min-width: 0;
+  }
+
+  .navbar.logged-out .nav-right .btn-signup {
+    display: flex !important;
+    flex: 0 0 42px;
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    height: 40px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .navbar.logged-out #navSignUpBtn {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  .nav-right .btn-signup::after {
+    content: '↪';
+    font-size: 18px;
+    line-height: 1;
+  }
 }
 .file-dropzone {
     border: 2px dashed rgba(6, 182, 212, 0.4);
