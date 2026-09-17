@@ -1037,12 +1037,12 @@ body {
   .navbar { 
     min-height: auto; 
     padding: 10px clamp(12px, 3vw, 20px); 
-    flex-wrap: wrap; 
+    flex-wrap: nowrap; 
     gap: 10px; 
   }
   .nav-left { 
     gap: clamp(8px, 2vw, 16px);
-    flex: 1;
+    flex: 0 0 auto;
   }
   .nav-menu {
     display: none;
@@ -1123,6 +1123,8 @@ body {
     transform: scale(1) rotate(0);
   }
   .nav-right { 
+    flex: 1 1 auto;
+    min-width: 0;
     gap: clamp(6px, 1.5vw, 12px);
   }
   #navBookmarksBtn {
@@ -1150,9 +1152,12 @@ body {
     transform: translateY(-1px);
   }
   .search-box { 
-    flex-shrink: 0;
-    width: auto;
-    min-width: 150px;
+    width: 100%;
+    min-width: 0;
+  }
+  .search-wrapper {
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .main-content { 
     margin: 20px auto; 
@@ -1200,8 +1205,8 @@ body {
     display: none;
   }
   .search-box { 
-    min-width: 120px;
-    width: auto;
+    min-width: 0;
+    width: 100%;
   }
   .search-box input {
     font-size: 12px;
@@ -2206,7 +2211,7 @@ body {
     font-size: 10px;
   }
   .search-box {
-    min-width: 100px;
+    min-width: 0;
   }
   .titles-grid-list,
   .titles-media-grid {
@@ -2222,9 +2227,8 @@ body {
   .nav-menu a { 
     font-size: 14px; 
   }
-  .search-box { 
-    order: 3; 
-    width: 100%; 
+  .search-wrapper {
+    min-width: 0;
   }
   .btn { 
     min-height: 40px;
@@ -2246,6 +2250,13 @@ body {
   }
   .auth-card { 
     padding: 20px 15px; 
+  }
+}
+
+@media (max-width: 420px) {
+  .verify-digit {
+    width: 38px !important;
+    height: 44px !important;
   }
 }
 .file-dropzone {
