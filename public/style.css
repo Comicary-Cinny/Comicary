@@ -2259,6 +2259,33 @@ body {
     height: 44px !important;
   }
 }
+
+@media (max-width: 768px) {
+  .navbar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .navbar > .nav-left {
+    display: flex;
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+
+  .navbar > .nav-right {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .nav-right .search-wrapper,
+  .nav-right .search-box {
+    width: 100%;
+    min-width: 0;
+  }
+}
 .file-dropzone {
     border: 2px dashed rgba(6, 182, 212, 0.4);
     background-color: var(--search-bg);
